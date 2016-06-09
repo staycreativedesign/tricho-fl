@@ -1,0 +1,23 @@
+.table_wrapper
+  - if params[:action] == "specialoffers"
+    %p
+      We will offer special incentives and promotions through our Website for services and products purchased in our Salon. Some of the specials will be posted on the Website and some will be by “invitation only,” but to get any of these offers you need to be signed up and registered through our online form. Just fill in the few lines in the form, click “Continue” and you’re all set.
+  = form_for @message, :url => contact_path do |f|
+    %p
+      = f.label :name, "Full Name:"
+      %br/
+      = f.text_field :name
+    %p
+      = f.label :email,"Email:"
+      %br/
+      = f.text_field :email
+    %p
+      = f.label :phone,"Phone:"
+      %br/
+      = f.text_field :phone
+    %p
+      = f.label :message,"Message:"
+      %br/
+      = f.text_area :message, cols:70, rows: 8
+    %p
+      = f.submit "Submit", :disable_with => 'Submiting...'

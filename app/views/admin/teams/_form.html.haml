@@ -1,0 +1,29 @@
+.main-page-text
+  %h2.intro.shadow.color-white
+    Team Member
+  %p.color-white.intro.shadow Team Member Options
+.table_wrapper.new_team
+  - if @member.image.present?
+    = image_tag ("#{@member.image}")
+  %ul
+    = form_for [:admin, @member] do |f|
+      %li
+        = f.label :name
+        %br/
+        = f.text_field :name
+      %li
+        = f.label :job
+        %br/
+        = f.text_field :job
+      %li
+        = f.label :image
+        %br/
+        = f.file_field :image
+      %li
+        = f.label :bio
+        %br/
+        = f.text_area :bio, rows: "40"
+      = f.submit "Create Tem Member", class: "btn btn-primary"
+  %p
+    = link_to "Remove Team Member", @member, method: "delete"
+

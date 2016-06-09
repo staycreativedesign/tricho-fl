@@ -1,0 +1,17 @@
+.main-page-text
+  %h2.intro.shadow.color-white
+    Our Team
+  %p.color-white.intro.shadow View a list of our stylists
+.table_wrapper_team.new_team
+  %ul
+    - @members.each do |team|
+      %li.float-left
+        = link_to(image_tag("#{team.image}"), team )
+        %br/
+        %span.team_name= team.name
+        %br/
+        %span.team_job= team.job
+        %br/
+        %span.team_link
+          = link_to "Edit",  edit_admin_team_path(team)
+

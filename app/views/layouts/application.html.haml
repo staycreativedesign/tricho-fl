@@ -1,0 +1,16 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title Tricho
+    = stylesheet_link_tag    'application', media: 'all'
+    = csrf_meta_tags
+    = javascript_include_tag 'application'
+  %body
+    - if flash[:notice]
+      .flash-notice
+        = flash[:notice]
+    .logo-area
+      = link_to(image_tag("tricho-salon-wellington.png"), root_path)
+    = render "layouts/nav"
+    = yield

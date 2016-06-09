@@ -1,0 +1,22 @@
+.table_wrapper.new_team
+  - if @event.image.present?
+    = image_tag ("#{@event.image}")
+  %ul
+    = form_for [:admin, @event] do |f|
+      %li
+        = f.label :title
+        %br/
+        = f.text_field :title
+      %li
+        = f.label :image
+        %br/
+        = f.file_field :image
+      %li
+        = f.label :description
+        %br/
+        = f.text_area :description, rows: "40"
+      = f.submit class: "btn btn-primary"
+  %p
+    = link_to "Destroy", @event, method: "delete"
+
+

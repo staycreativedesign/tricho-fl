@@ -1,0 +1,33 @@
+%nav#cssmenu
+  %ul
+    %li.active.has-sub
+      = link_to "Services"
+      %ul
+        %li
+          = link_to "Haircut & Styling", haircut_path
+        %li
+          = link_to "Hair Color", haircolor_path
+        %li
+          = link_to "Hair Treatments", hairtreatment_path
+        %li
+          = link_to "Hair Rituals", hairrituals_path
+    %li.active.has-sub
+      = link_to "About us"
+      %ul
+        %li
+          = link_to "Gallery", gallery_path
+        %li
+          = link_to "Products", products_path
+    %li= link_to "Our Team", teams_path
+    %li= link_to "News & Events", events_path
+    %li= link_to "Special Offers", specialoffers_path
+    %li= link_to "Contact us", contact_path
+%ul.location.color-white.hours_wrapper
+  %li.bold.address_padding.hours_size Address
+  %li
+    10300 W Forest Hill Blvd #2000
+    %br/
+    Wellington, FL 33414
+  %li.bold.address_padding
+    Phone
+  %li 561-753-0052

@@ -1,0 +1,28 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title Tricho
+    = stylesheet_link_tag    'application', media: 'all'
+    = csrf_meta_tags
+    = javascript_include_tag 'application'
+  %body.admin-area
+    - if flash[:notice]
+      .flash-notice
+        = flash[:notice]
+    .nav-menu
+      .logo-area.float-left
+        = link_to(image_tag("tricho-salon-wellington.png"), root_path)
+      .nav-area.float-right
+        %ul
+          %li
+            = link_to "Team Members", admin_teams_path
+          %li
+            = link_to "Add Team Member", new_admin_team_path
+          %li
+            = link_to "Events", admin_events_path
+          %li
+            = link_to "Add Event", new_admin_event_path
+          %li
+            = link_to "Log Out", destroy_user_session_path, method: "DELETE"
+    = yield

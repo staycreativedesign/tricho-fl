@@ -10,6 +10,7 @@
 # Ignore the default SQLite database.
 /config/secrets.yml
 /config/database.yml
+/config/deploy.rb
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp

@@ -1,46 +1,46 @@
 require 'mina/bundler'
 require 'mina/rails'
 require 'mina/git'
-# require 'mina/rbenv'  # for rbenv support. (http://rbenv.org)
 require 'mina/rvm'    # for rvm support. (http://rvm.io)
 
 # Basic settings:
-#   domain       - The hostname to SSH to.
-#   deploy_to    - Path to deploy into.
-#   repository   - Git repo to clone from. (needed by mina/git)
-#   branch       - Branch name to deploy. (needed by mina/git)
+#   domain           - The hostname to SSH to.
+#   deploy_to        - Path to deploy into.
+#   repository       - Git repo to clone from. (needed by mina/git)
+#   branch           - Branch name to deploy. (needed by mina/git)
+#   secret_key_name  - Set Secret ENV name
+#   secret_key_pass  - Set Secret ENV password
 
-set :domain, 'foobar.com'
-set :deploy_to, '/var/www/foobar.com'
-set :repository, 'git://...'
+# Order of operation 1st time setup:
+#  mina setup
+#  mina set_bash
+#  mina config_copy
+#  setup nginx with correct gemset if necessary
+#  mina deploy
+
+set :domain, 'dot'
+set :deploy_to, '/var/www/tricho-fl'
+set :repository, 'git@github.com:staycreativedesign/tricho-fl.git'
 set :branch, 'master'
+# set :secret_key_name, 'VIVE_SECRET_KEY_BASE'
+# set :secret_key_pass, '6ad0be6bc44aa3c0d9b2751557e0cd2f46854932f0c4f5b0c21b5ae41844804c1f4721d7c006b654d67e3d48f094f5ecee62c6a53717e287f41a35b360d7cce3'
+set :db_name_env, 'TRICHO_DB'
+set :db_name, 'tricho_production'
+set :db_user_name_env, 'TRICHO_USER'
+set :db_user_name, 'tricho_admin'
+set :db_user_pass_env, 'TRICHO_DB_USER_PASS'
+set :db_user_pass, 'JMd[5aw!Sx(2'
 
-# For system-wide RVM install.
-#   set :rvm_path, '/usr/local/rvm/bin/rvm'
-
-# Manually create these paths in shared/ (eg: shared/config/database.yml) in your server.
-# They will be linked in the 'deploy:link_shared_paths' step.
-set :shared_paths, ['config/database.yml', 'config/secrets.yml', 'log', 'public/uploads/']
-
-# Optional settings:
-#   set :user, 'foobar'    # Username in the server to SSH to.
-#   set :port, '30000'     # SSH port number.
-#   set :forward_agent, true     # SSH forward_agent.
+set :shared_paths, ['config/database.yml', 'config/secrets.yml', 'log']
+set :term_mode, :pretty
+set :forward_agent, true     # SSH forward_agent.
 
 # This task is the environment that is loaded for most commands, such as
 # `mina deploy` or `mina rake`.
 task :environment do
-  # If you're using rbenv, use this to load the rbenv environment.
-  # Be sure to commit your .ruby-version or .rbenv-version to your repository.
-  # invoke :'rbenv:load'
-
-  # For those using RVM, use this to load an RVM version@gemset.
-  # invoke :'rvm:use[ruby-1.9.3-p125@default]'
+   invoke :'rvm:use[ruby-2.3.1@global]'
 end
 
-# Put any custom mkdir's in here for when `mina setup` is ran.
-# For Rails apps, we'll make some of the shared paths that are shared between
-# all releases.
 task :setup => :environment do
   queue! %[mkdir -p "#{deploy_to}/#{shared_path}/log"]
   queue! %[chmod g+rx,u+rwx "#{deploy_to}/#{shared_path}/log"]
@@ -48,7 +48,9 @@ task :setup => :environment do
   queue! %[mkdir -p "#{deploy_to}/#{shared_path}/config"]
   queue! %[chmod g+rx,u+rwx "#{deploy_to}/#{shared_path}/config"]
 
-  queue! %[touch "#{deploy_to}/#{shared_path}/public/uploads/"]
+  queue! %[mkdir -p "#{deploy_to}/#{shared_path}/public/uploads"]
+  queue! %[chmod g+rx,u+rwx "#{deploy_to}/#{shared_path}/public/uploads"]
+
   queue! %[touch "#{deploy_to}/#{shared_path}/config/database.yml"]
   queue! %[touch "#{deploy_to}/#{shared_path}/config/secrets.yml"]
   queue  %[echo "-----> Be sure to edit '#{deploy_to}/#{shared_path}/config/database.yml' and 'secrets.yml'."]
@@ -65,6 +67,22 @@ task :setup => :environment do
   end
 end
 
+desc "Add Enviroment Variable to bash_profile"
+task :set_bash => :environment do
+  # Set Enviromental Variable for Production
+  # queue! %[echo '#{secret_key_name}="#{secret_key_pass}"' >> ~/.bash_profile]
+  queue! %[echo '#{db_name_env}="#{db_name}"' >> ~/.bash_profile]
+  queue! %[echo '#{db_user_name_env}="#{db_user_name}"' >> ~/.bash_profile]
+  queue! %[echo '#{db_user_name_pass_env}="#{db_user_pass}"' >> ~/.bash_profile]
+  queue! %[source ~/.bash_profile]
+end
+
+desc 'Copy local database and secret files to server'
+task :config_copy do
+  system "scp config/secrets.yml dot:/var/www/vive/shared/config"
+  system "scp config/database.yml dot:/var/www/vive/shared/config"
+end
+
 desc "Deploys the current version to the server."
 task :deploy => :environment do
   to :before_hook do
@@ -75,6 +93,8 @@ task :deploy => :environment do
     # instance of your project.
     invoke :'git:clone'
     invoke :'deploy:link_shared_paths'
+    queue! %[gem install bundler]
+    # queue! %[rvm install ruby-2.2.1]
     invoke :'bundle:install'
     invoke :'rails:db_migrate'
     invoke :'rails:assets_precompile'
@@ -86,10 +106,3 @@ task :deploy => :environment do
     end
   end
 end
-
-# For help in making your deploy script, see the Mina documentation:
-#
-#  - http://nadarei.co/mina
-#  - http://nadarei.co/mina/tasks
-#  - http://nadarei.co/mina/settings
-#  - http://nadarei.co/mina/helpers
